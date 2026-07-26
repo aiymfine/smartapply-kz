@@ -8,21 +8,28 @@
     "dev": "node --watch src/app.js",
     "test": "jest --coverage --verbose"
   },
-  "keywords": ["resume", "ai", "autofill", "parser", "jobs", "kazakhstan"],
+  "keywords": [
+    "resume",
+    "ai",
+    "autofill",
+    "parser",
+    "jobs",
+    "kazakhstan"
+  ],
   "author": "Aiym Kuzdenbay",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.21.0",
     "cors": "^2.8.5",
-    "helmet": "^8.0.0",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
-    "pdf-parse": "^1.1.1",
-    "mammoth": "^1.8.0",
-    "zod": "^3.23.8",
-    "node-fetch": "^3.3.2",
     "dotenv": "^16.4.5",
-    "express-rate-limit": "^7.4.0"
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^8.0.0",
+    "mammoth": "^1.8.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.2.0",
+    "node-fetch": "^3.3.2",
+    "pdf-parse": "^1.1.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "jest": "^29.7.0",
@@ -30,6 +37,8 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"]
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   }
 }
