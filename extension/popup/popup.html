@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,101 +8,156 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      width: 380px;
+      width: 400px;
+      max-height: 600px;
+      overflow-y: auto;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: #0f172a;
       color: #e2e8f0;
-      padding: 0;
     }
 
+    body::-webkit-scrollbar { width: 6px; }
+    body::-webkit-scrollbar-track { background: #0f172a; }
+    body::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    /* ── Header ── */
     .header {
       background: linear-gradient(135deg, #2563eb, #7c3aed);
-      padding: 20px;
-      text-align: center;
+      padding: 18px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .header h1 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .header p {
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .header p { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      margin-top: 14px;
+    }
+
+    .tab {
+      padding: 6px 12px;
       font-size: 12px;
-      opacity: 0.85;
+      font-weight: 600;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
-    .content {
-      padding: 20px;
+    .tab.active {
+      background: rgba(255,255,255,0.95);
+      color: #1e293b;
     }
 
+    .tab:hover:not(.active) {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    /* ── Content ── */
+    .tab-content { display: none; padding: 18px 20px; }
+    .tab-content.active { display: block; }
+
+    /* ── Site Badge ── */
+    .site-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .site-badge.supported { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+    .site-badge.unsupported { background: rgba(100, 116, 139, 0.1); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.2); }
+
+    .site-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .site-badge.supported .dot { background: #22c55e; }
+    .site-badge.unsupported .dot { background: #64748b; }
+
+    /* ── Upload Zone ── */
     .upload-zone {
       border: 2px dashed #334155;
       border-radius: 12px;
-      padding: 28px 16px;
+      padding: 24px 16px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-
-    .upload-zone:hover {
-      border-color: #2563eb;
-      background: rgba(37, 99, 235, 0.05);
-    }
-
-    .upload-zone.has-file {
-      border-color: #22c55e;
-      background: rgba(34, 197, 94, 0.05);
-    }
-
-    .upload-icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
-
-    .upload-zone p {
-      font-size: 13px;
-      color: #94a3b8;
-    }
+    .upload-zone:hover { border-color: #2563eb; background: rgba(37, 99, 235, 0.05); }
+    .upload-zone.has-file { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
+    .upload-icon { font-size: 28px; margin-bottom: 6px; }
+    .upload-zone p { font-size: 12px; color: #94a3b8; }
 
     .file-info {
-      font-size: 12px;
+      font-size: 11px;
       color: #22c55e;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
+    /* ── Buttons ── */
     .btn {
       width: 100%;
-      padding: 12px;
+      padding: 11px;
       border: none;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
     .btn-primary {
       background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: white;
     }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: white;
     }
+    .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-success:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
     .btn-secondary {
       background: #1e293b;
       color: #e2e8f0;
       border: 1px solid #334155;
     }
-
     .btn-secondary:hover { background: #334155; }
 
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* ── Status ── */
     .status {
       padding: 10px 14px;
       border-radius: 8px;
@@ -110,99 +165,300 @@
       margin-bottom: 12px;
       display: none;
     }
-
     .status.show { display: block; }
     .status.info { background: rgba(37, 99, 235, 0.1); color: #60a5fa; }
     .status.success { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
     .status.error { background: rgba(239, 68, 68, 0.1); color: #f87171; }
     .status.loading { background: rgba(234, 179, 8, 0.1); color: #facc15; }
 
+    /* ── Data Preview ── */
     .data-preview {
       background: #1e293b;
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       margin-bottom: 12px;
       display: none;
     }
-
     .data-preview.show { display: block; }
-
     .data-preview h3 {
-      font-size: 12px;
+      font-size: 11px;
       color: #94a3b8;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
     }
-
     .data-row {
       display: flex;
       justify-content: space-between;
       font-size: 12px;
-      padding: 4px 0;
-      border-bottom: 1px solid #334155;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
     }
-
     .data-row:last-child { border-bottom: none; }
     .data-row .label { color: #94a3b8; }
-    .data-row .value { color: #e2e8f0; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .data-row .value { color: #e2e8f0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .footer {
-      padding: 12px 20px;
+    /* ── Score Display ── */
+    .score-display {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
       text-align: center;
+    }
+
+    .score-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 800;
+      position: relative;
+      background: conic-gradient(var(--score-color) calc(var(--score-percent) * 1%), #334155 0);
+    }
+
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: #1e293b;
+    }
+
+    .score-circle span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .score-grade {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .score-summary {
       font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    .score-categories {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .score-cat {
+      background: rgba(51, 65, 85, 0.3);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .score-cat-name { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
+    .score-cat-value { font-size: 16px; font-weight: 700; margin-top: 2px; }
+
+    /* ── Suggestions ── */
+    .suggestion {
+      background: #1e293b;
+      border-left: 3px solid;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .suggestion.high { border-color: #ef4444; }
+    .suggestion.medium { border-color: #f59e0b; }
+    .suggestion.low { border-color: #3b82f6; }
+
+    .suggestion .priority {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      float: right;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .suggestion.high .priority { background: rgba(239,68,68,0.15); color: #f87171; }
+    .suggestion.medium .priority { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .suggestion.low .priority { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+    .suggestion .issue { color: #e2e8f0; margin-top: 4px; }
+    .suggestion .fix { color: #94a3b8; font-size: 11px; margin-top: 4px; }
+
+    /* ── Cover Letter ── */
+    textarea {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+      margin-bottom: 10px;
+    }
+    textarea:focus { outline: none; border-color: #2563eb; }
+    textarea::placeholder { color: #475569; }
+
+    .cover-letter-output {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      color: #cbd5e1;
+      display: none;
+    }
+    .cover-letter-output.show { display: block; }
+
+    .lang-select {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .lang-btn {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 10px;
       color: #475569;
       border-top: 1px solid #1e293b;
     }
 
+    /* ── Spinner ── */
     .spinner {
       display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(250, 204, 21, 0.2);
+      width: 12px; height: 12px;
+      border: 2px solid rgba(250,204,21,0.2);
       border-top-color: #facc15;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin-right: 6px;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>SmartApply KZ</h1>
-    <p>AI-powered resume autofill for Kazakhstani job sites</p>
+    <div class="header-top">
+      <div>
+        <h1>⚡ SmartApply KZ</h1>
+        <p>AI resume autofill for Kazakhstani job sites</p>
+      </div>
+    </div>
+    <div class="tab-nav">
+      <button class="tab active" data-tab="autofill">📊 Autofill</button>
+      <button class="tab" data-tab="score">🎯 Score</button>
+      <button class="tab" data-tab="cover">✉️ Cover Letter</button>
+    </div>
   </div>
 
-  <div class="content">
-    <div id="status" class="status"></div>
+  <!-- ════════ AUTOFILL TAB ════════ -->
+  <div id="tab-autofill" class="tab-content active">
+    <div id="siteBadge" class="site-badge unsupported">
+      <div class="dot"></div>
+      <span id="siteStatus">Checking current site...</span>
+    </div>
+
+    <div id="afStatus" class="status"></div>
 
     <div id="uploadZone" class="upload-zone">
       <div class="upload-icon">📄</div>
-      <p>Click to upload resume</p>
-      <p style="font-size: 11px; margin-top: 4px;">PDF or DOCX • Max 5MB</p>
+      <p>Нажмите чтобы загрузить резюме</p>
+      <p style="font-size: 10px; margin-top: 3px;">PDF или DOCX • Макс 5MB</p>
       <div id="fileInfo" class="file-info" style="display: none;"></div>
     </div>
 
     <input type="file" id="fileInput" accept=".pdf,.docx,.doc" style="display: none;">
 
     <div id="dataPreview" class="data-preview">
-      <h3>Extracted Data</h3>
+      <h3>Извлеченные данные</h3>
       <div id="dataRows"></div>
     </div>
 
     <button id="autofillBtn" class="btn btn-primary" disabled>
-      ⚡ Autofill This Page
+      ⚡ Заполнить форму автоматически
     </button>
 
-    <button id="clearBtn" class="btn btn-secondary" style="display: none;">
-      🗑 Clear Resume Data
+    <button id="clearBtn" class="btn btn-danger" style="display: none;">
+      🗑 Очистить данные
+    </button>
+  </div>
+
+  <!-- ════════ SCORE TAB ════════ -->
+  <div id="tab-score" class="tab-content">
+    <div id="scStatus" class="status"></div>
+
+    <div id="scorePlaceholder">
+      <p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px 0;">
+        🎯 Получите AI оценку вашего резюме.<br>
+        Оценка по 100-балльной шкале с конкретными советами по улучшению.
+      </p>
+      <button id="scoreBtn" class="btn btn-primary">
+        🔍 Оценить резюме
+      </button>
+      <p style="font-size: 11px; color: #475569; text-align: center; margin-top: 8px;">
+        Требуется загруженное резюме
+      </p>
+    </div>
+
+    <div id="scoreResult" style="display: none;"></div>
+  </div>
+
+  <!-- ════════ COVER LETTER TAB ════════ -->
+  <div id="tab-cover" class="tab-content">
+    <div id="clStatus" class="status"></div>
+
+    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">
+      Вставьте описание вакансии, и AI напишет сопроводительное письмо на основе вашего резюме.
+    </p>
+
+    <div class="lang-select">
+      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="kz">KZ</button>
+    </div>
+
+    <textarea id="jobDescription" placeholder="Вставьте описание вакансии здесь..."></textarea>
+
+    <button id="generateCoverBtn" class="btn btn-success" disabled>
+      ✉️ Сгенерировать письмо
+    </button>
+
+    <div id="coverLetterOutput" class="cover-letter-output"></div>
+
+    <button id="copyCoverBtn" class="btn btn-secondary" style="display: none;">
+      📋 Копировать текст
     </button>
   </div>
 
   <div class="footer">
-    SmartApply KZ • Your data stays in your browser
+    SmartApply KZ • Данные хранятся только в вашем браузере
   </div>
 
   <script src="popup.js"></script>

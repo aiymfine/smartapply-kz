@@ -33,6 +33,8 @@ router.get('/', (req, res) => {
       'GET  /api/health',
       'POST /api/parse/upload  — Upload PDF/DOCX resume',
       'POST /api/parse/text    — Parse raw resume text',
+      'POST /api/score         — Score resume + improvement suggestions',
+      'POST /api/cover-letter  — Generate tailored cover letter',
     ],
   });
 });

@@ -14,6 +14,9 @@ require('dotenv').config();
 
 const parseRoutes = require('./routes/parse');
 const healthRoutes = require('./routes/health');
+const scoreRoutes = require('./routes/score');
+const coverLetterRoutes = require('./routes/cover-letter');
+const sitesRoutes = require('./routes/sites');
 
 const app = express();
 const PORT = process.env.PORT || 3200;
@@ -45,6 +48,9 @@ app.use('/static', express.static(path.join(__dirname, '../extension')));
 // ── Routes ──
 app.use('/api/health', healthRoutes);
 app.use('/api/parse', parseRoutes);
+app.use('/api/score', scoreRoutes);
+app.use('/api/cover-letter', coverLetterRoutes);
+app.use('/api/sites', sitesRoutes);
 
 // ── 404 Handler ──
 app.use((req, res) => {
@@ -55,6 +61,8 @@ app.use((req, res) => {
       'GET  /api/health',
       'POST /api/parse/upload',
       'POST /api/parse/text',
+      'POST /api/score',
+      'POST /api/cover-letter',
     ],
   });
 });
