@@ -17,6 +17,7 @@ const healthRoutes = require('./routes/health');
 const scoreRoutes = require('./routes/score');
 const coverLetterRoutes = require('./routes/cover-letter');
 const sitesRoutes = require('./routes/sites');
+const matchRoutes = require('./routes/match');
 
 const app = express();
 const PORT = process.env.PORT || 3200;
@@ -51,6 +52,7 @@ app.use('/api/parse', parseRoutes);
 app.use('/api/score', scoreRoutes);
 app.use('/api/cover-letter', coverLetterRoutes);
 app.use('/api/sites', sitesRoutes);
+app.use('/api/match', matchRoutes);
 
 // ── 404 Handler ──
 app.use((req, res) => {

@@ -44,6 +44,29 @@ describe('POST /api/cover-letter', () => {
   });
 });
 
+describe('POST /api/match', () => {
+  it('should reject empty body', async () => {
+    const res = await request(app)
+      .post('/api/match')
+      .send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('should reject missing resume data', async () => {
+    const res = await request(app)
+      .post('/api/match')
+      .send({ jobDescription: 'Looking for a developer with Node.js experience' });
+    expect(res.status).toBe(400);
+  });
+
+  it('should reject short job description', async () => {
+    const res = await request(app)
+      .post('/api/match')
+      .send({ resumeData: { skills: ['Node.js'] }, jobDescription: 'short' });
+    expect(res.status).toBe(400);
+  });
+});
+
 describe('GET /api/sites', () => {
   it('should return list of supported sites', async () => {
     const res = await request(app).get('/api/sites');

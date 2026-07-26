@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "SmartApply KZ API",
+    "description": "AI-powered resume parsing, scoring, cover letter generation, and job matching for the Kazakhstani job market.\n\nBase URL: http://localhost:3200",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3200", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "Upload Resume (PDF/DOCX)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "resume", "type": "file", "src": [], "description": "PDF or DOCX resume file (max 5MB)" }
+          ]
+        },
+        "url": "{{baseUrl}}/api/parse/upload"
+      }
+    },
+    {
+      "name": "Parse Resume Text",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"John Doe\\nSoftware Engineer\\nEmail: john@example.com\\nPhone: +1 555 123 4567\\n\\nSkills: JavaScript, Node.js, Docker, PostgreSQL\\n\\nExperience:\\nTechCorp — Software Engineer (2022-Present)\\nBuilt REST APIs serving 1M+ daily requests.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/parse/text"
+      }
+    },
+    {
+      "name": "Score Resume",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resumeText\": \"Aiym Kuzdenbay\\nBackend Developer\\naiymfine@gmail.com\\n\\nSkills: Python, JavaScript, Node.js, Docker, PostgreSQL, Nmap, Wireshark\\n\\nExperience:\\nITWorldz LLC — Developer (2024-Present)\\nBuilt AI automation for e-commerce platform.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/score"
+      }
+    },
+    {
+      "name": "Generate Cover Letter",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resumeData\": {\n    \"personal\": { \"fullName\": \"Aiym Kuzdenbay\", \"email\": \"aiymfine@gmail.com\" },\n    \"skills\": [\"Node.js\", \"Python\", \"Docker\", \"PostgreSQL\"],\n    \"experience\": [{ \"company\": \"ITWorldz\", \"role\": \"Developer\" }]\n  },\n  \"jobDescription\": \"We are looking for a Backend Developer with experience in Node.js and PostgreSQL...\",\n  \"language\": \"ru\"\n}"
+        },
+        "url": "{{baseUrl}}/api/cover-letter"
+      }
+    },
+    {
+      "name": "Analyze Job Match",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resumeData\": {\n    \"personal\": { \"fullName\": \"Aiym Kuzdenbay\" },\n    \"skills\": [\"Node.js\", \"Python\", \"Docker\", \"PostgreSQL\", \"Nmap\"],\n    \"experience\": [{ \"company\": \"ITWorldz\", \"role\": \"Developer\" }]\n  },\n  \"jobDescription\": \"Looking for a Senior Backend Developer with 5+ years of Node.js, Kubernetes, and AWS experience. Must know GraphQL and microservices.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/match"
+      }
+    },
+    {
+      "name": "List Supported Sites",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/sites"
+      }
+    },
+    {
+      "name": "Get Site Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/sites/hh-kz"
+      }
+    }
+  ]
+}

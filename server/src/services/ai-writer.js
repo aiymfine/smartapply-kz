@@ -62,6 +62,33 @@ Guidelines:
   - "ru": Professional Russian (деловой стиль)
   - "kz": Professional Kazakh (қазақ тілі)`;
 
+// ── Job Match Prompt ──
+const MATCH_SYSTEM_PROMPT = `You are an expert tech recruiter analyzing how well a candidate's resume matches a job description.
+Return ONLY valid JSON (no markdown, no explanation).
+
+Schema:
+{
+  "overallMatch": <number 0-100>,
+  "verdict": "<strong-match | good-match | partial-match | weak-match | no-match>",
+  "matchedSkills": ["skills that appear in both resume and JD"],
+  "missingSkills": ["skills required in JD but not in resume"],
+  "additionalAssets": ["skills in resume not required but valuable"],
+  "experienceMatch": { "score": <0-100>, "notes": "<assessment>" },
+  "educationMatch": { "score": <0-100>, "notes": "<assessment>" },
+  "recommendations": [
+    { "type": "<highlight | gap | suggestion>", "text": "<specific actionable advice>" }
+  ],
+  "summary": "<2-3 sentence overall assessment>"
+}
+
+Verdict guide:
+- strong-match (85-100): Excellent fit
+- good-match (70-84): Solid fit, minor gaps
+- partial-match (50-69): Some relevant experience
+- weak-match (30-49): Significant gaps
+- no-match (0-29): Wrong role
+Be honest and specific.`;
+
 /**
  * Call LLM API
  */
@@ -149,4 +176,39 @@ Write the cover letter now.`;
   };
 }
 
-module.exports = { generateScore, generateCoverLetter };
+module.exports = { generateScore, generateCoverLetter, analyzeMatch };
+
+/**
+ * Analyze how well resume matches a job description
+ */
+async function analyzeMatch(resumeData, jobDescription) {
+  const resumeStr = typeof resumeData === 'string'
+    ? resumeData
+    : JSON.stringify(resumeData, null, 2);
+
+  const userMessage = `CANDIDATE RESUME:
+${resumeStr.substring(0, 6000)}
+
+JOB DESCRIPTION:
+${jobDescription.substring(0, 4000)}
+
+Analyze the match.`;
+
+  const content = await callLLM(
+    MATCH_SYSTEM_PROMPT,
+    userMessage,
+    0.2
+  );
+
+  // Extract JSON
+  let jsonStr = content;
+  const codeBlock = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlock) jsonStr = codeBlock[1];
+  const firstBrace = jsonStr.indexOf('{');
+  const lastBrace = jsonStr.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1) {
+    jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+  }
+
+  return JSON.parse(jsonStr.trim());
+}
