@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "SmartApply KZ — AI Resume Autofill",
+  "version": "1.0.0",
+  "description": "Upload your resume once. AI fills job application forms automatically on hh.kz, Kaspi, Enbek.kz and more.",
+  "author": "Aiym Kuzdenbay",
+
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+
+  "host_permissions": [
+    "https://hh.kz/*",
+    "https://kz.hh.ru/*",
+    "https://kaspi.kz/*",
+    "https://enbek.kz/*",
+    "https://jobs.enbek.kz/*",
+    "http://localhost:3200/*"
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "SmartApply KZ"
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://hh.kz/*",
+        "https://kz.hh.ru/*",
+        "https://kaspi.kz/*",
+        "https://enbek.kz/*",
+        "https://jobs.enbek.kz/*"
+      ],
+      "js": ["content/detector.js", "content/autofill.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
