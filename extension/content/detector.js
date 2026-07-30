@@ -90,7 +90,11 @@
     city: {
       selectors: [
         'input#city_residence',
+        'select#city_residence',
+        'select#city',
+        'input#city',
         'input[name="city_residence"]',
+        'select[name="city"]',
         'input[name*="city" i]',
         'input[name*="location" i]',
         'input[placeholder*="город" i]',
