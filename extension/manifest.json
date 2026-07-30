@@ -15,6 +15,7 @@
     "https://hh.kz/*",
     "https://kz.hh.ru/*",
     "https://kaspi.kz/*",
+    "https://job.kaspi.kz/*",
     "https://enbek.kz/*",
     "https://jobs.enbek.kz/*",
     "http://localhost:3200/*"
@@ -42,6 +43,7 @@
         "https://hh.kz/*",
         "https://kz.hh.ru/*",
         "https://kaspi.kz/*",
+        "https://job.kaspi.kz/*",
         "https://enbek.kz/*",
         "https://jobs.enbek.kz/*"
       ],

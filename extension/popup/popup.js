@@ -4,7 +4,7 @@
  */
 
 const SERVER_URL = 'http://localhost:3200';
-const SUPPORTED_DOMAINS = ['hh.kz', 'kz.hh.ru', 'kaspi.kz', 'enbek.kz', 'jobs.enbek.kz'];
+const SUPPORTED_DOMAINS = ['hh.kz', 'kz.hh.ru', 'almaty.hh.kz', 'astana.hh.kz', 'kaspi.kz', 'job.kaspi.kz', 'enbek.kz', 'jobs.enbek.kz'];
 
 let currentLang = 'en';
 

@@ -55,6 +55,7 @@
 
   /**
    * Fill a single field based on its tag type
+   * Handles React, Vue, and Nuxt controlled inputs
    */
   function fillField(el, value) {
     // Clear existing value
@@ -65,24 +66,31 @@
       fillSelect(el, value);
     } else if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = Boolean(value);
+    } else if (el.type === 'date') {
+      // Date inputs need YYYY-MM-DD format
+      const date = new Date(value);
+      if (!isNaN(date)) {
+        el.value = date.toISOString().split('T')[0];
+      } else {
+        el.value = value;
+      }
     } else {
       // Text inputs, textareas
-      el.value = value;
+      // Use native setter to work with React/Vue controlled inputs
+      const proto = el.tagName === 'TEXTAREA'
+        ? window.HTMLTextAreaElement.prototype
+        : window.HTMLInputElement.prototype;
 
-      // Simulate typing for React/Vue controlled inputs
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype, 'value'
-      )?.set || Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype, 'value'
-      )?.set;
+      const nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(el, value);
+      if (nativeSetter) {
+        nativeSetter.call(el, value);
       } else {
         el.value = value;
       }
     }
 
+    // Trigger all events frameworks listen to
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     el.dispatchEvent(new Event('blur', { bubbles: true }));

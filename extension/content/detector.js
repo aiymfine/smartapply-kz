@@ -9,39 +9,61 @@
 
   // ── Field detection patterns ──
   const FIELD_PATTERNS = {
-    // Personal info
+    // Personal info — first name
+    firstName: {
+      selectors: [
+        'input#first_name',
+        'input[name="first_name"]',
+        'input[name*="firstname" i]',
+        'input[name*="first_name" i]',
+        'input[placeholder*="имя" i]:not([placeholder*="фамили" i])',
+        'input[id*="firstname" i]',
+        'input[id*="first_name" i]',
+      ],
+      getValue: (data) => {
+        const full = data.personal?.fullName || '';
+        // For Western names: "John Doe" → first="John"
+        // For KZ/RU names: "Айым Кузденбай" → first="Айым"
+        const parts = full.trim().split(/\s+/);
+        return parts[0] || '';
+      },
+    },
+    // Last name
+    lastName: {
+      selectors: [
+        'input#last_name',
+        'input[name="last_name"]',
+        'input[name*="lastname" i]',
+        'input[name*="last_name" i]',
+        'input[name*="surname" i]',
+        'input[placeholder*="фамили" i]',
+        'input[id*="lastname" i]',
+        'input[id*="last_name" i]',
+      ],
+      getValue: (data) => {
+        const full = data.personal?.fullName || '';
+        const parts = full.trim().split(/\s+/);
+        return parts.slice(1).join(' ') || '';
+      },
+    },
+    // Full name (single field)
     fullName: {
       selectors: [
-        'input[name*="name" i]',
         'input[name*="fullname" i]',
+        'input[name*="full_name" i]',
         'input[name*="fio" i]',
-        'input[placeholder*="имя" i]',
         'input[placeholder*="ФИО" i]',
         'input[placeholder*="name" i]',
-        'input[id*="name" i]',
+        'input[id*="fullname" i]',
+        'input[id*="full_name" i]',
         'input[data-field="name"]',
       ],
       getValue: (data) => data.personal?.fullName || '',
     },
-    firstName: {
-      selectors: [
-        'input[name*="firstname" i]',
-        'input[name*="first_name" i]',
-        'input[placeholder*="имя" i]:not([placeholder*="фамилия" i])',
-      ],
-      getValue: (data) => (data.personal?.fullName || '').split(' ')[1] || '',
-    },
-    lastName: {
-      selectors: [
-        'input[name*="lastname" i]',
-        'input[name*="last_name" i]',
-        'input[name*="surname" i]',
-        'input[placeholder*="фамилия" i]',
-      ],
-      getValue: (data) => (data.personal?.fullName || '').split(' ')[0] || '',
-    },
+    // Email
     email: {
       selectors: [
+        'input#email',
         'input[type="email"]',
         'input[name*="email" i]',
         'input[name*="mail" i]',
@@ -51,8 +73,10 @@
       ],
       getValue: (data) => data.personal?.email || '',
     },
+    // Phone
     phone: {
       selectors: [
+        'input#phone',
         'input[type="tel"]',
         'input[name*="phone" i]',
         'input[name*="tel" i]',
@@ -62,12 +86,16 @@
       ],
       getValue: (data) => data.personal?.phone || '',
     },
+    // City
     city: {
       selectors: [
+        'input#city_residence',
+        'input[name="city_residence"]',
         'input[name*="city" i]',
         'input[name*="location" i]',
         'input[placeholder*="город" i]',
         'input[placeholder*="city" i]',
+        'input[id*="city" i]',
         'select[name*="city" i]',
       ],
       getValue: (data) => {
@@ -75,6 +103,54 @@
         return loc.split(',')[0].trim();
       },
     },
+    // Birthday
+    birthday: {
+      selectors: [
+        'input#birthday',
+        'input[name="birthday"]',
+        'input[name*="birth" i]',
+        'input[type="date"]',
+        'input[id*="birthday" i]',
+      ],
+      getValue: (data) => data.personal?.birthday || '',
+    },
+    // Education type (dropdown)
+    education: {
+      selectors: [
+        'select#type_of_education',
+        'select[name="type_of_education"]',
+        'select[name*="education" i]',
+        'select[id*="education" i]',
+      ],
+      getValue: (data) => {
+        const education = data.education?.[0];
+        if (!education) return '';
+        const degree = (education.degree || '').toUpperCase();
+        // Map common degrees to Kaspi dropdown values
+        if (degree.includes('BS') || degree.includes('BACHELOR') || degree.includes('БАКАЛАВР'))
+          return 'Высшее';
+        if (degree.includes('MS') || degree.includes('MASTER') || degree.includes('МАГИСТР'))
+          return 'Высшее';
+        if (degree.includes('PHD'))
+          return 'Высшее';
+        return 'Высшее'; // default for CS students
+      },
+    },
+    // Cover letter / About
+    coverLetter: {
+      selectors: [
+        'textarea[data-qa="vacancy-response-popup-form-letter-input"]',
+        'textarea[data-qa="vacancy-response-letter"]',
+        'textarea[name*="letter" i]',
+        'textarea[name*="summary" i]',
+        'textarea[name*="about" i]',
+        'textarea[placeholder*="о себе" i]',
+        'textarea[placeholder*="about" i]',
+        'textarea[placeholder*="сопроводительн" i]',
+      ],
+      getValue: (data) => data.coverLetter || data.summary || '',
+    },
+    // LinkedIn
     linkedin: {
       selectors: [
         'input[name*="linkedin" i]',
@@ -82,15 +158,15 @@
       ],
       getValue: (data) => data.personal?.linkedin || '',
     },
-    summary: {
+    // Resume/CV upload
+    resumeUpload: {
       selectors: [
-        'textarea[name*="summary" i]',
-        'textarea[name*="about" i]',
-        'textarea[name*="description" i]',
-        'textarea[placeholder*="о себе" i]',
-        'textarea[placeholder*="about" i]',
+        'input#file',
+        'input[type="file"]',
+        'input[accept*="pdf"]',
+        'input[accept*="docx"]',
       ],
-      getValue: (data) => data.summary || '',
+      getValue: () => '', // Can't autofill file inputs via JS
     },
   };
 
