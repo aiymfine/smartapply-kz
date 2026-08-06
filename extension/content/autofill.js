@@ -74,8 +74,18 @@
 
     if (el.tagName === 'SELECT') {
       fillSelect(el, value);
-    } else if (el.type === 'checkbox' || el.type === 'radio') {
+    } else if (el.type === 'checkbox') {
       el.checked = Boolean(value);
+    } else if (el.type === 'radio') {
+      // Radio buttons: check the one matching the value
+      const radioGroup = document.querySelectorAll(`input[type="radio"][name="${el.name}"]`);
+      for (const radio of radioGroup) {
+        if (radio.value.toLowerCase() === String(value).toLowerCase()) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+          break;
+        }
+      }
     } else if (el.type === 'date') {
       // Date inputs need YYYY-MM-DD
       const date = new Date(value);

@@ -17,6 +17,8 @@ Return ONLY valid JSON (no markdown, no explanation). Use this exact schema:
 {
   "personal": {
     "fullName": "string",
+    "middleName": "string (patronymic or middle name, empty if none)",
+    "birthday": "string (YYYY-MM-DD if available, empty otherwise)",
     "email": "string",
     "phone": "string",
     "location": "string",
@@ -74,7 +76,10 @@ Rules:
 - Use empty arrays [] for missing array fields
 - Normalize dates to YYYY-MM format where possible
 - Extract phone numbers in international format
-- Keep descriptions concise`;
+- Keep descriptions concise
+- For fullName, use the complete name as written in the resume
+- Extract middleName/patronymic separately if present (common in KZ/RU names)
+- Extract birthday if explicitly mentioned (format: YYYY-MM-DD)`;
 
 /**
  * Extract structured resume data using LLM

@@ -161,6 +161,9 @@ function displayData(data) {
   if (data.personal?.email) rows.push(['Email', data.personal.email]);
   if (data.personal?.phone) rows.push(['Телефон', data.personal.phone]);
   if (data.personal?.location) rows.push(['Город', data.personal.location]);
+  if (data.personal?.birthday) rows.push(['День рождения', data.personal.birthday]);
+  if (data.education?.[0]?.institution) rows.push(['ВУЗ', data.education[0].institution]);
+  if (data.education?.[0]?.field) rows.push(['Специальность', data.education[0].field]);
   if (data.skills?.length) rows.push(['Навыки', data.skills.slice(0, 5).join(', ') + (data.skills.length > 5 ? '...' : '')]);
   if (data.experience?.length) rows.push(['Опыт', `${data.experience.length} записей`]);
   if (data.education?.length) rows.push(['Образование', `${data.education.length} записей`]);

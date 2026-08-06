@@ -8,6 +8,8 @@ const { z } = require('zod');
 const ResumeSchema = z.object({
   personal: z.object({
     fullName: z.string().default(''),
+    middleName: z.string().default(''),
+    birthday: z.string().default(''),
     email: z.string().default(''),
     phone: z.string().default(''),
     location: z.string().default(''),
