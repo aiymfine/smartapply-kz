@@ -3,537 +3,633 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartApply KZ — AI Resume Autofill for Kazakhstan</title>
-  <meta name="description" content="Upload your resume once. AI fills job application forms on hh.kz, Kaspi, Enbek.kz automatically. Resume scoring, cover letter generation, and more.">
+  <title>SmartApply KZ — Resume Intelligence API for Job Platforms</title>
+  <meta name="description" content="Resume parsing, autofill, and scoring API for Kazakhstani job platforms. Reduce form abandonment, improve data quality.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #0f172a;
-      --bg2: #1e293b;
+      --bg: #ffffff;
+      --bg-alt: #f8f9fb;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
       --accent: #2563eb;
-      --accent2: #7c3aed;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --border: #334155;
-      --green: #22c55e;
+      --accent-hover: #1d4ed8;
+      --accent-light: #eff6ff;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --radius: 8px;
+      --max-w: 1080px;
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      overflow-x: hidden;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Animated background ── */
-    .bg-glow {
-      position: fixed;
-      top: -200px; left: -200px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: 0;
-      animation: float 20s ease-in-out infinite;
-    }
-    .bg-glow.two {
-      top: auto; bottom: -200px; left: auto; right: -200px;
-      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
-      animation-delay: -10s;
-    }
-    @keyframes float {
-      0%,100% { transform: translate(0,0); }
-      33% { transform: translate(100px,-50px); }
-      66% { transform: translate(-50px,100px); }
-    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
 
     /* ── Nav ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 0;
+      height: 60px;
     }
 
-    .logo {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .nav-links { display: flex; gap: 28px; }
-    .nav-links a {
-      color: var(--muted);
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
       text-decoration: none;
+    }
+    .brand:hover { text-decoration: none; }
+    .brand-mark {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a {
+      color: var(--text-secondary);
       font-size: 14px;
       font-weight: 500;
-      transition: color 0.2s;
+      text-decoration: none;
     }
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
 
     .nav-cta {
-      padding: 8px 20px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      padding: 7px 16px;
+      background: var(--accent);
       color: white;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
       font-weight: 600;
-      transition: transform 0.2s;
+      text-decoration: none;
+      transition: background 0.15s;
     }
-    .nav-cta:hover { transform: translateY(-2px); }
+    .nav-cta:hover { background: var(--accent-hover); text-decoration: none; }
 
     /* ── Hero ── */
     .hero {
-      padding: 80px 0 60px;
+      padding: 80px 0 64px;
       text-align: center;
     }
 
-    .hero-badge {
-      display: inline-block;
-      padding: 6px 16px;
-      background: rgba(37,99,235,0.1);
-      border: 1px solid rgba(37,99,235,0.3);
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      background: var(--accent-light);
+      border: 1px solid #bfdbfe;
       border-radius: 100px;
-      font-size: 13px;
-      color: #60a5fa;
-      margin-bottom: 24px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 28px;
+      letter-spacing: 0.02em;
     }
 
     .hero h1 {
-      font-size: 52px;
-      font-weight: 800;
-      line-height: 1.1;
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
       margin-bottom: 20px;
-      letter-spacing: -1px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    .hero h1 .gradient {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero p {
-      font-size: 18px;
-      color: var(--muted);
-      max-width: 600px;
+    .hero .subhead {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 580px;
       margin: 0 auto 36px;
     }
 
-    .hero-buttons {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-lg {
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary-lg {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: white;
-    }
-    .btn-primary-lg:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37,99,235,0.3); }
-
-    .btn-ghost-lg {
-      background: var(--bg2);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost-lg:hover { border-color: var(--accent); }
-
-    /* ── Stats ── */
-    .stats {
-      display: flex;
-      gap: 48px;
-      justify-content: center;
-      margin: 48px 0;
-      flex-wrap: wrap;
-    }
-    .stat { text-align: center; }
-    .stat-num {
-      font-size: 32px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .stat-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
-    /* ── Features ── */
-    .features {
-      padding: 60px 0;
-    }
-
-    .section-title {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-    .section-title h2 { font-size: 36px; font-weight: 700; }
-    .section-title p { color: var(--muted); font-size: 16px; margin-top: 8px; }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .feature-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px;
-      transition: all 0.3s ease;
-    }
-    .feature-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    }
-
-    .feature-icon {
-      width: 48px; height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15));
-    }
-
-    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .feature-card p { color: var(--muted); font-size: 14px; }
-
-    /* ── How It Works ── */
-    .how-it-works {
-      padding: 60px 0;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-    }
-
-    .step {
-      text-align: center;
-      position: relative;
-    }
-
-    .step-num {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-      margin: 0 auto 16px;
-    }
-
-    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-    .step p { color: var(--muted); font-size: 14px; }
-
-    /* ── Sites ── */
-    .supported-sites {
-      padding: 60px 0;
-    }
-
-    .sites-row {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 32px;
-    }
-
-    .site-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .site-pill:hover { border-color: var(--green); }
-    .site-pill .check { color: var(--green); font-size: 18px; }
-
-    /* ── Tech Stack ── */
-    .tech-stack {
-      padding: 60px 0;
-    }
-
-    .tech-grid {
+    .hero-actions {
       display: flex;
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 32px;
     }
 
-    .tech-tag {
-      padding: 8px 18px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+    .btn {
+      padding: 11px 24px;
+      border-radius: var(--radius);
       font-size: 14px;
-      color: var(--muted);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--text-muted); text-decoration: none; }
+
+    /* ── Metrics ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 64px 0;
+      overflow: hidden;
+    }
+    .metric {
+      background: var(--bg);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* ── Sections ── */
+    section { padding: 64px 0; }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+    .section-header h2 {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+
+    /* ── Features ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .feature {
+      background: var(--bg);
+      padding: 32px 28px;
+    }
+    .feature-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      background: var(--accent-light);
+    }
+    .feature-icon svg { width: 18px; height: 18px; }
+    .feature h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .feature p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    /* ── How it works ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .step {
+      position: relative;
+    }
+    .step-number {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+    .step h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .step p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* ── Sites ── */
+    .sites-section { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .sites-list {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .site-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .site-item .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    .site-item.coming .status-dot { background: var(--text-muted); }
+    .site-item.coming { color: var(--text-muted); }
+
+    /* ── API Preview ── */
+    .api-preview {
+      background: #0f172a;
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+    .api-preview .method { color: #60a5fa; font-weight: 600; }
+    .api-preview .url { color: #e2e8f0; }
+    .api-preview .comment { color: #64748b; }
+    .api-preview .key { color: #a78bfa; }
+    .api-preview .str { color: #86efac; }
+
+    /* ── Tech ── */
+    .tech-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tech-tag {
+      padding: 6px 14px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
       font-weight: 500;
     }
 
     /* ── CTA ── */
-    .cta {
-      padding: 80px 0;
+    .cta-section {
       text-align: center;
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
     }
-
-    .cta-box {
-      background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1));
-      border: 1px solid rgba(37,99,235,0.3);
-      border-radius: 24px;
-      padding: 48px;
+    .cta-section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
-
-    .cta-box h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
-    .cta-box p { color: var(--muted); font-size: 16px; margin-bottom: 28px; }
+    .cta-section p {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
 
     /* ── Footer ── */
     footer {
-      padding: 32px 0;
       border-top: 1px solid var(--border);
-      text-align: center;
-      color: var(--muted);
+      padding: 32px 0;
       font-size: 13px;
+      color: var(--text-muted);
     }
-
-    footer a { color: var(--text); text-decoration: none; }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { color: var(--text-secondary); }
 
     /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .hero h1 { font-size: 36px; }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
       .nav-links { display: none; }
-      .stats { gap: 24px; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .feature-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .footer-content { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="bg-glow"></div>
-  <div class="bg-glow two"></div>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="/" class="brand">
+          <div class="brand-mark">S</div>
+          SmartApply KZ
+        </a>
+        <div class="nav-links">
+          <a href="#features">Product</a>
+          <a href="#how">How it works</a>
+          <a href="#api">API</a>
+          <a href="https://github.com/aiymfine/smartapply-kz">GitHub</a>
+        </div>
+        <a href="https://github.com/aiymfine/smartapply-kz" class="nav-cta">Get started</a>
+      </nav>
+    </div>
+  </header>
 
-  <div class="container">
-    <!-- ── Nav ── -->
-    <nav>
-      <div class="logo">⚡ SmartApply KZ</div>
-      <div class="nav-links">
-        <a href="#features">Возможности</a>
-        <a href="#how">Как работает</a>
-        <a href="#sites">Сайты</a>
-        <a href="https://github.com/aiymfine/smartapply-kz">GitHub</a>
-      </div>
-      <a href="https://github.com/aiymfine/smartapply-kz" class="nav-cta">⬇ Установить</a>
-    </nav>
-
-    <!-- ── Hero ── -->
-    <section class="hero">
-      <div class="hero-badge">🇰🇿 Сделано для рынка Казахстана</div>
-      <h1>
-        Загрузи резюме один раз.<br>
-        <span class="gradient">AI заполнит всё остальное.</span>
-      </h1>
-      <p>
-        SmartApply извлекает данные из вашего резюме и автоматически заполняет
-        формы на hh.kz, Kaspi и Enbek.kz. Оценка резюме, сопроводительные письма — всё в одном.
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-label">Resume Intelligence API · Kazakhstan</div>
+      <h1>Turn resume uploads into completed job applications</h1>
+      <p class="subhead">
+        One upload replaces 13 form fields. SmartApply parses PDF/DOCX resumes
+        and returns structured data ready for autofill — built for job platforms in Kazakhstan.
       </p>
-      <div class="hero-buttons">
-        <a href="https://github.com/aiymfine/smartapply-kz" class="btn-lg btn-primary-lg">
-          ⬇ Скачать расширение
+      <div class="hero-actions">
+        <a href="https://github.com/aiymfine/smartapply-kz" class="btn btn-primary">
+          View on GitHub
         </a>
-        <a href="#features" class="btn-lg btn-ghost-lg">
-          Узнать больше →
+        <a href="#api" class="btn btn-secondary">
+          API Docs
         </a>
       </div>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-num">3+</div>
-          <div class="stat-label">Поддерживаемых сайтов</div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-value">13</div>
+          <div class="metric-label">Form fields auto-filled</div>
         </div>
-        <div class="stat">
-          <div class="stat-num">3</div>
-          <div class="stat-label">Языка (EN/RU/KZ)</div>
+        <div class="metric">
+          <div class="metric-value">3</div>
+          <div class="metric-label">Job platforms supported</div>
         </div>
-        <div class="stat">
-          <div class="stat-num">100</div>
-          <div class="stat-label">Балльная оценка</div>
+        <div class="metric">
+          <div class="metric-value">&lt;2s</div>
+          <div class="metric-label">Parse + extract time</div>
         </div>
-        <div class="stat">
-          <div class="stat-num">0₸</div>
-          <div class="stat-label">Бесплатно</div>
+        <div class="metric">
+          <div class="metric-value">26</div>
+          <div class="metric-label">Tests passing</div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ── Features ── -->
-    <section class="features" id="features">
-      <div class="section-title">
-        <h2>Что умеет SmartApply</h2>
-        <p>Три инструмента для поиска работы в одном расширении</p>
+  <!-- ── Features ── -->
+  <section id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built for the hiring funnel</h2>
+        <p>Everything needed to reduce friction between "upload resume" and "submit application"</p>
       </div>
 
       <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">📋</div>
-          <h3>Автозаполнение форм</h3>
-          <p>Загрузите резюме в PDF или DOCX. AI извлечёт все данные и заполнит формы на сайтах вакансий одним кликом. Больше никаких ручных анкет.</p>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3>Resume parsing</h3>
+          <p>PDF and DOCX ingestion via AI. Extracts personal info, work history, education, skills, projects, and languages into structured JSON.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <h3>Оценка резюме</h3>
-          <p>Получите 100-балльную оценку вашего резюме. Разбор по 6 категориям: контент, форматирование, навыки, опыт, образование, ключевые слова.</p>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Form autofill</h3>
+          <p>Drop-in script detects form fields on job sites and fills them with parsed resume data. Handles Vue, React, and masked inputs.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">✉️</div>
-          <h3>Сопроводительные письма</h3>
-          <p>Вставьте описание вакансии — получите готовое сопроводительное письмо. На английском, русском или казахском. На основе вашего реального опыта.</p>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Resume scoring</h3>
+          <p>Quantitative 0–100 score across six categories: content, formatting, skills, experience, education, and keywords.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3>Приватность</h3>
-          <p>Ваши данные хранятся только в браузере. Сервер обрабатывает резюме и сразу забывает. Никаких аккаунтов, никакой слежки.</p>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Cover letter generation</h3>
+          <p>Context-aware cover letters based on the job description and candidate's actual experience. Russian, English, and Kazakh.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>AI на базе GLM-4.5</h3>
-          <p>Работает на большой языковой модели GLM-4.5 Flash. Точное извлечение данных из резюме любого формата и структуры.</p>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+          </div>
+          <h3>Job match analysis</h3>
+          <p>Compare resume data against a job description. Returns match percentage, matched skills, and gaps.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Открытый исходный код</h3>
-          <p>Полностью open-source на GitHub. MIT лицензия. Прозрачность — никаких скрытых процессов, весь код доступен для аудита.</p>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Privacy-first</h3>
+          <p>No accounts, no tracking. Resumes are processed and discarded. All candidate data stays in the browser by default.</p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ── How It Works ── -->
-    <section class="how-it-works" id="how">
-      <div class="section-title">
-        <h2>Как это работает</h2>
-        <p>Три шага от резюме до поданной заявки</p>
+  <!-- ── How it works ── -->
+  <section id="how" style="background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div class="section-header">
+        <h2>How it works</h2>
+        <p>Three steps from raw resume to completed application</p>
       </div>
 
       <div class="steps">
         <div class="step">
-          <div class="step-num">1</div>
-          <h3>Загрузите резюме</h3>
-          <p>PDF или DOCX. AI извлечёт имя, контакты, навыки, опыт, образование — всё структурированно.</p>
+          <div class="step-number">STEP 01</div>
+          <h3>Upload resume</h3>
+          <p>Candidate uploads a PDF or DOCX. The API extracts structured data — personal info, experience, education, skills — in under two seconds.</p>
         </div>
         <div class="step">
-          <div class="step-num">2</div>
-          <h3>Откройте сайт вакансий</h3>
-          <p>Перейдите на hh.kz, Kaspi или Enbek.kz. Расширение определит поддерживаемый сайт автоматически.</p>
+          <div class="step-number">STEP 02</div>
+          <h3>Detect fields</h3>
+          <p>The client-side script scans the job application form and maps detected inputs to resume fields. Works with Vue/Nuxt, React, and vanilla HTML.</p>
         </div>
         <div class="step">
-          <div class="step-num">3</div>
-          <h3>Нажмите «Заполнить»</h3>
-          <p>Один клик — и все поля заполнены. Меньше ручного ввода = больше поданных заявок.</p>
+          <div class="step-number">STEP 03</div>
+          <h3>Autofill</h3>
+          <p>One click fills all matched fields. Properly triggers framework change events so SPA state stays in sync. Candidate reviews and submits.</p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ── Supported Sites ── -->
-    <section class="supported-sites" id="sites">
-      <div class="section-title">
-        <h2>Поддерживаемые платформы</h2>
-        <p>Главшие сайты вакансий Казахстана</p>
+  <!-- ── API ── -->
+  <section id="api">
+    <div class="container">
+      <div class="section-header">
+        <h2>API reference</h2>
+        <p>RESTful endpoints. Send a resume, get structured data back.</p>
       </div>
 
-      <div class="sites-row">
-        <div class="site-pill"><span class="check">✓</span> HeadHunter KZ</div>
-        <div class="site-pill"><span class="check">✓</span> Kaspi.kz</div>
-        <div class="site-pill"><span class="check">✓</span> Enbek.kz</div>
-        <div class="site-pill" style="opacity: 0.5;">⏳ OLX Jobs</div>
-      </div>
-    </section>
+      <div class="api-preview">
+<span class="comment"># Parse resume from upload (multipart/form-data)</span>
+<span class="method">POST</span> <span class="url">/api/parse/upload</span>
+  <span class="key">→</span> { <span class="key">"personal"</span>: { <span class="key">"fullName"</span>: <span class="str">"..."</span>, <span class="key">"email"</span>: <span class="str">"..."</span> }, <span class="key">"skills"</span>: [...], <span class="key">"experience"</span>: [...] }
 
-    <!-- ── Tech Stack ── -->
-    <section class="tech-stack">
-      <div class="section-title">
-        <h2>Технологии</h2>
-        <p>Современный стек, оптимизированный для скорости и приватности</p>
+<span class="comment"># Score resume (0-100)</span>
+<span class="method">POST</span> <span class="url">/api/score</span>
+  <span class="key">→</span> { <span class="key">"score"</span>: <span class="str">78</span>, <span class="key">"grade"</span>: <span class="str">"B+"</span>, <span class="key">"categories"</span>: {...}, <span class="key">"suggestions"</span>: [...] }
+
+<span class="comment"># Generate cover letter</span>
+<span class="method">POST</span> <span class="url">/api/cover-letter</span>
+  <span class="key">→</span> { <span class="key">"coverLetter"</span>: <span class="str">"Dear Hiring Manager..."</span> }
+
+<span class="comment"># Job match analysis</span>
+<span class="method">POST</span> <span class="url">/api/match</span>
+  <span class="key">→</span> { <span class="key">"matchPercentage"</span>: <span class="str">85</span>, <span class="key">"matchedSkills"</span>: [...], <span class="key">"missingSkills"</span>: [...] }
+
+<span class="comment"># Supported sites</span>
+<span class="method">GET</span>  <span class="url">/api/sites</span>
+  <span class="key">→</span> [{ <span class="key">"id"</span>: <span class="str">"kaspi-kz"</span>, <span class="key">"name"</span>: <span class="str">"Kaspi.kz"</span>, <span class="key">"fields"</span>: <span class="str">13</span> }]
       </div>
 
-      <div class="tech-grid">
+      <div style="margin-top: 20px;">
+        <a href="https://smartapply-kz-production.up.railway.app/api/health" class="btn btn-secondary">
+          Try the live API →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Supported platforms ── -->
+  <section class="sites-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Supported platforms</h2>
+        <p>Tested against live sites, not just mockups</p>
+      </div>
+      <div class="sites-list">
+        <div class="site-item"><span class="status-dot"></span> HeadHunter KZ (hh.kz)</div>
+        <div class="site-item"><span class="status-dot"></span> Kaspi.kz Jobs</div>
+        <div class="site-item"><span class="status-dot"></span> Enbek.kz</div>
+        <div class="site-item coming"><span class="status-dot"></span> OLX Jobs — in progress</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tech stack ── -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <h2>Technology</h2>
+      </div>
+      <div class="tech-tags">
         <span class="tech-tag">Node.js</span>
-        <span class="tech-tag">Express.js</span>
+        <span class="tech-tag">Express</span>
         <span class="tech-tag">Chrome Extension MV3</span>
         <span class="tech-tag">GLM-4.5 Flash</span>
-        <span class="tech-tag">Zod</span>
+        <span class="tech-tag">Zod validation</span>
         <span class="tech-tag">Docker</span>
         <span class="tech-tag">Jest</span>
-        <span class="tech-tag">GitHub Actions</span>
+        <span class="tech-tag">GitHub Actions CI</span>
         <span class="tech-tag">Helmet</span>
-        <span class="tech-tag">Rate Limiting</span>
+        <span class="tech-tag">Rate limiting</span>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ── CTA ── -->
-    <section class="cta">
-      <div class="cta-box">
-        <h2>Готовы упростить поиск работы?</h2>
-        <p>Бесплатно. Open-source. Данные остаются в вашем браузере.</p>
-        <div class="hero-buttons">
-          <a href="https://github.com/aiymfine/smartapply-kz" class="btn-lg btn-primary-lg">
-            ⬆ Перейти на GitHub
-          </a>
-          <a href="https://github.com/aiymfine/smartapply-kz/blob/main/README.md" class="btn-lg btn-ghost-lg">
-            📖 Документация
-          </a>
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Reduce form abandonment.</h2>
+      <p>Open source. Production-ready. Try the API now.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/aiymfine/smartapply-kz" class="btn btn-primary">GitHub Repository</a>
+        <a href="https://smartapply-kz-production.up.railway.app/api/health" class="btn btn-secondary">Live API</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>SmartApply KZ — MIT License</div>
+        <div class="footer-links">
+          <a href="https://github.com/aiymfine/smartapply-kz">GitHub</a>
+          <a href="https://smartapply-kz-production.up.railway.app/api/health">API Status</a>
+          <a href="https://github.com/aiymfine/smartapply-kz/blob/main/README.md">Docs</a>
         </div>
       </div>
-    </section>
+    </div>
+  </footer>
 
-    <!-- ── Footer ── -->
-    <footer>
-      <p>SmartApply KZ — <a href="https://github.com/aiymfine/smartapply-kz">GitHub</a> · MIT License · Сделано с ☕ в Алматы, Казахстан 🇰🇿</p>
-    </footer>
-  </div>
-
-  <script>
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-      });
-    });
-  </script>
 </body>
 </html>
