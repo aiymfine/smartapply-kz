@@ -44,7 +44,7 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 
 // ── Landing page ──
-app.use(express.static(path.join(__dirname, '../../landing')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // ── Static (for extension auto-update, if needed later) ──
 app.use('/static', express.static(path.join(__dirname, '../extension')));
@@ -70,6 +70,11 @@ app.use('/api/*', (req, res) => {
       'POST /api/cover-letter',
     ],
   });
+});
+
+// ── Root route → landing page ──
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // ── Error Handler ──
