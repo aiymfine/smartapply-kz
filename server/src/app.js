@@ -68,6 +68,8 @@ app.use('/api/*', (req, res) => {
       'POST /api/parse/text',
       'POST /api/score',
       'POST /api/cover-letter',
+      'POST /api/match',
+      'GET  /api/sites',
     ],
   });
 });

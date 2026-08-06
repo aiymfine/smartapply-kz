@@ -1,124 +1,55 @@
-# 🚀 SmartApply KZ
+# SmartApply KZ
 
-**AI-powered resume toolkit for the Kazakhstani job market.**
+**Resume intelligence API and autofill engine for Kazakhstani job platforms.**
 
-Upload your resume once → AI extracts everything → autofill job applications, score your resume, and generate tailored cover letters. Works on hh.kz, Kaspi, Enbek.kz.
+Upload a resume → AI extracts structured data → autofill job application forms, score resumes, generate cover letters. Built for hh.kz, Kaspi.kz, and Enbek.kz.
 
 ![Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green)
-![Tests](https://img.shields.io/badge/tests-23%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-26%20passing-brightgreen)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
----
-
-## ✨ Features
-
-### 📋 Smart Autofill
-Upload your resume (PDF/DOCX) → AI extracts structured data → **one-click autofill** on supported job sites. No more manual form filling.
-
-### 🎯 Resume Scoring
-Get a **100-point AI assessment** with category breakdowns (content, formatting, skills, experience, education, keywords) and actionable improvement suggestions.
-
-### ✉️ Cover Letter Generator
-Paste a job description → get a **tailored cover letter** in English, Russian, or Kazakh. Based on your actual experience, not templates.
-
-### 🔒 Privacy First
-Resume data stays in your browser's local storage. The server processes and forgets — nothing stored, nothing tracked.
+**Live API:** https://smartapply-kz-production.up.railway.app/api/health
 
 ---
 
-## 🏗️ Architecture
+## Features
+
+- **Resume parsing** — PDF/DOCX → structured JSON via GLM-4.5 Flash
+- **Form autofill** — detects and fills up to 13 form fields on supported sites
+- **Resume scoring** — quantitative 0–100 score across 6 categories
+- **Cover letter generation** — context-aware, in EN/RU/KZ
+- **Job match analysis** — resume vs. job description comparison
+- **Privacy-first** — data stays in browser, server processes and forgets
+
+---
+
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    BROWSER EXTENSION (MV3)                    │
-│                                                              │
-│  ┌──────────────┐  ┌──────────┐  ┌───────────────────────┐  │
-│  │  Popup UI    │  │ Background│  │  Content Scripts      │  │
-│  │  (3 tabs)    │  │ Worker   │  │  (Detector + Autofill) │  │
-│  │  - Autofill  │──▶│          │──▶│                       │  │
-│  │  - Score     │  │  Storage │  │  hh.kz / Kaspi /      │  │
-│  │  - Cover Ltr │  │  Manager │  │  Enbek.kz             │  │
-│  └──────────────┘  └────┬─────┘  └───────────────────────┘  │
-│                         │                                    │
-└─────────────────────────┼────────────────────────────────────┘
-                          │ HTTP (parsing, scoring, generation)
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    BACKEND API (Node.js)                      │
-│                                                              │
-│  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌────────────┐  │
-│  │  Express │─▶│  Parser   │─▶│ AI LLM   │─▶│ Zod Valid  │  │
-│  │  Server  │  │  (PDF/    │  │ (GLM-4.5 │  │            │  │
-│  │  :3200   │  │   DOCX)   │  │  Flash)  │  │            │  │
-│  └──────────┘  └───────────┘  └────┬─────┘  └────────────┘  │
-│                                    │                          │
-│  ┌─────────────────────────────────┼──────────────────────┐  │
-│  │           AI Services            │                      │  │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐             │  │
-│  │  │ Extract  │  │  Score   │  │  Cover   │             │  │
-│  │  │ Resume   │  │  Resume  │  │  Letter  │             │  │
-│  │  └──────────┘  └──────────┘  └──────────┘             │  │
-│  └─────────────────────────────────────────────────────────┘  │
-│                                                              │
-│  ┌────────────┐  ┌───────────┐  ┌────────────────────────┐  │
-│  │ Rate Limit │  │  Helmet   │  │  Regex Fallback (no    │  │
-│  │  + CORS    │  │  Security │  │  API key needed)       │  │
-│  └────────────┘  └───────────┘  └────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+Browser Extension (MV3)
+├── Popup UI (autofill / score / cover letter tabs)
+├── Background worker (storage + API communication)
+└── Content scripts
+    ├── Detector — scans page for form fields
+    └── Autofill — fills fields with resume data
+        Works with: Vue/Nuxt, React, vanilla HTML
+        Handles: text, select, radio, date, masked inputs
+
+Backend API (Express.js)
+├── POST /api/parse/upload   — PDF/DOCX → structured JSON
+├── POST /api/parse/text     — raw text → structured JSON
+├── POST /api/score          — 0-100 score + suggestions
+├── POST /api/cover-letter   — AI cover letter (EN/RU/KZ)
+├── POST /api/match          — resume vs job description
+├── GET  /api/sites          — supported platforms info
+└── GET  /api/health         — status + system info
 ```
 
 ---
 
-## 📁 Project Structure
-
-```
-smartapply-kz/
-├── server/                         # Backend API
-│   ├── src/
-│   │   ├── app.js                  # Express app
-│   │   ├── routes/
-│   │   │   ├── health.js           # GET /api/health
-│   │   │   ├── parse.js            # POST /api/parse/upload|text
-│   │   │   ├── score.js            # POST /api/score
-│   │   │   ├── cover-letter.js     # POST /api/cover-letter
-│   │   │   └── sites.js            # GET /api/sites
-│   │   ├── services/
-│   │   │   ├── parser.js           # PDF/DOCX text extraction
-│   │   │   ├── extractor.js        # LLM structured extraction
-│   │   │   ├── regex-fallback.js   # No-API fallback extractor
-│   │   │   └── ai-writer.js        # Scoring + cover letter AI
-│   │   └── schemas/
-│   │       └── resume.js           # Zod validation schema
-│   ├── tests/                      # 23 Jest + Supertest tests
-│   ├── Dockerfile
-│   └── package.json
-│
-├── extension/                      # Chrome/Firefox Extension (MV3)
-│   ├── manifest.json
-│   ├── background.js               # Service worker
-│   ├── content/
-│   │   ├── detector.js             # Universal form field detector
-│   │   └── autofill.js             # React/Vue-compatible autofill
-│   ├── popup/
-│   │   ├── popup.html              # Tabbed UI (Autofill/Score/Cover)
-│   │   └── popup.js                # Full popup logic
-│   ├── sites/                      # Per-site field mappings
-│   │   ├── hh-kz.js
-│   │   ├── kaspi-kz.js
-│   │   └── enbek-kz.js
-│   └── icons/                      # Extension icons
-│
-├── .github/workflows/ci.yml        # GitHub Actions CI
-├── docker-compose.yml
-├── .env.example
-└── README.md
-```
-
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Backend
 
@@ -127,12 +58,12 @@ git clone https://github.com/aiymfine/smartapply-kz.git
 cd smartapply-kz/server
 npm install
 
-# Optional: add API key for AI features (works without it using regex)
-cp ../.env.example ../.env
-# Edit .env: ZAI_API_KEY=your_key
+# Optional: add LLM key for AI features (regex fallback works without it)
+echo "ZAI_API_KEY=your_key" > .env
+echo "LLM_MODEL=glm-4.5-flash" >> .env
 
-npm run dev    # Start server
-npm test       # Run tests
+npm run dev    # Start on port 3200
+npm test       # Run 26 tests
 ```
 
 ### Browser Extension
@@ -140,8 +71,8 @@ npm test       # Run tests
 1. Open `chrome://extensions`
 2. Enable **Developer mode**
 3. **Load unpacked** → select `extension/` folder
-4. Click the SmartApply icon → upload resume
-5. Visit any supported job site → click **Autofill**
+4. Click SmartApply icon → upload resume
+5. Visit a supported job site → click **Autofill**
 
 ### Docker
 
@@ -151,70 +82,93 @@ docker compose up -d
 
 ---
 
-## 🔌 API Endpoints
+## API Reference
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/health` | Health check + system info |
-| `POST` | `/api/parse/upload` | Upload PDF/DOCX → structured JSON |
-| `POST` | `/api/parse/text` | Parse raw text → structured JSON |
-| `POST` | `/api/score` | AI score resume (0-100) + suggestions |
-| `POST` | `/api/cover-letter` | Generate tailored cover letter (EN/RU/KZ) |
-| `GET` | `/api/sites` | List supported job sites |
+**Base URL:** `https://smartapply-kz-production.up.railway.app`
 
-### Example: Score a Resume
+### Parse resume from upload
 
 ```bash
-curl -X POST http://localhost:3200/api/score \
-  -H "Content-Type: application/json" \
-  -d '{"resumeText": "John Doe, Software Engineer with 5 years..."}'
+curl -X POST /api/parse/upload \
+  -F "resume=@my_resume.pdf"
 ```
 
-### Example: Generate Cover Letter
+### Parse resume from text
 
 ```bash
-curl -X POST http://localhost:3200/api/cover-letter \
+curl -X POST /api/parse/text \
+  -H "Content-Type: application/json" \
+  -d '{"text": "John Doe, Software Engineer..."}'
+```
+
+### Score resume
+
+```bash
+curl -X POST /api/score \
+  -H "Content-Type: application/json" \
+  -d '{"resumeText": "Full resume text..."}'
+```
+
+### Generate cover letter
+
+```bash
+curl -X POST /api/cover-letter \
   -H "Content-Type: application/json" \
   -d '{
     "resumeData": {"personal": {"fullName": "Aiym"}, "skills": ["Node.js"]},
-    "jobDescription": "Looking for a backend developer with Node.js experience...",
+    "jobDescription": "Looking for a backend developer...",
     "language": "ru"
+  }'
+```
+
+### Job match analysis
+
+```bash
+curl -X POST /api/match \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resumeData": {"skills": ["Node.js", "Docker"]},
+    "jobDescription": "Need Node.js + Kubernetes experience..."
   }'
 ```
 
 ---
 
-## 🌐 Supported Job Sites
+## Supported Job Sites
 
-| Site | URL | Status |
-|------|-----|--------|
-| HeadHunter KZ | hh.kz | ✅ Supported |
-| Kaspi Jobs | kaspi.kz | ✅ Supported |
-| Enbek.kz | enbek.kz | ✅ Supported |
-| OLX Jobs | olx.kz | 🔜 Planned |
-
----
-
-## 🔒 Privacy
-
-- Resume data stored **locally** in Chrome Storage — never on servers
-- Backend processes files in memory, **nothing persisted**
-- No accounts, no tracking, no analytics
-- Autofill runs entirely **client-side**
+| Site | URL | Form Fields | Status |
+|------|-----|-------------|--------|
+| Kaspi.kz Jobs | job.kaspi.kz | 13 fields mapped | Verified |
+| HeadHunter KZ | hh.kz | One-click apply + cover letter | Verified |
+| Enbek.kz | enbek.kz | Mapped | Untested |
+| OLX Jobs | olx.kz | — | Planned |
 
 ---
 
-## 🧪 Testing
+## Kaspi.kz Form Fields
 
-```bash
-cd server && npm test
-```
+Fields detected and mapped on job.kaspi.kz application form:
 
-23 tests covering: health, parsing, scoring, cover letter, sites, validation, error handling.
+| Field | HTML ID | Auto-filled |
+|-------|---------|-------------|
+| First name | `#first_name` | Yes |
+| Last name | `#last_name` | Yes |
+| Middle name | `#middle_name` | Yes |
+| Email | `#email` | Yes |
+| Phone | `#phone` | Yes (masked input) |
+| City | `#city_residence` | Yes |
+| Birthday | `#birthday` | Yes (DD.MM.YYYY) |
+| Education type | `#type_of_education` | Yes (select) |
+| University | `#university` | Yes |
+| Major | `#major` | Yes |
+| Graduation year | `#graduation_year` | Yes |
+| Is student | `input[name="is_student"]` | Yes (radio) |
+| Resume link | `#link_to_resume` | Yes |
+| File upload | `#file` | No (browser security) |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -223,17 +177,53 @@ cd server && npm test
 | Document Parsing | pdf-parse, mammoth |
 | Validation | Zod |
 | Extension | Manifest V3, Vanilla JS |
-| Testing | Jest, Supertest (23 tests) |
+| Testing | Jest, Supertest (26 tests) |
 | CI/CD | GitHub Actions |
-| Container | Docker, docker-compose |
+| Deploy | Railway |
 | Security | Helmet, CORS, Rate Limiting |
 
 ---
 
-## 📝 License
+## Testing
 
-MIT © [Aiym Kuzdenbay](https://github.com/aiymfine)
+```bash
+cd server && npm test
+```
+
+26 tests covering: health, parsing, scoring, cover letter, match analysis, sites API, validation, and error handling.
 
 ---
 
-_Made with ☕ in Almaty, Kazakhstan_
+## Project Structure
+
+```
+smartapply-kz/
+├── server/
+│   ├── src/
+│   │   ├── app.js              # Express app + landing page
+│   │   ├── routes/             # 6 API route handlers
+│   │   ├── services/           # Parser, extractor, AI writer, regex fallback
+│   │   └── schemas/            # Zod resume schema
+│   ├── tests/                  # Jest + Supertest
+│   ├── public/                 # Landing page (served by Express)
+│   └── package.json
+├── extension/
+│   ├── manifest.json           # MV3 with host permissions
+│   ├── background.js           # Service worker
+│   ├── content/
+│   │   ├── detector.js         # Universal field detector (14 field types)
+│   │   └── autofill.js         # Framework-compatible autofill engine
+│   ├── popup/                  # 3-tab UI (Autofill / Score / Cover Letter)
+│   ├── options/                # Settings page
+│   └── sites/                  # Per-site field mappings
+├── landing/                    # Landing page source
+├── .github/workflows/ci.yml    # GitHub Actions CI
+├── Dockerfile
+└── docker-compose.yml
+```
+
+---
+
+## License
+
+MIT © [Aiym Kuzdenbay](https://github.com/aiymfine)

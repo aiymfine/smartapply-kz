@@ -5,6 +5,11 @@
 const request = require('supertest');
 const app = require('../src/app');
 
+// Check if LLM API key is available
+const HAS_API_KEY = Boolean(process.env.ZAI_API_KEY || process.env.LLM_API_KEY);
+// Use real LLM only when explicitly opted in (PARSE_LIVE_TEST=true)
+const LIVE_TEST = process.env.PARSE_LIVE_TEST === 'true';
+
 describe('POST /api/parse/text', () => {
   it('should reject empty body', async () => {
     const res = await request(app)
@@ -22,7 +27,7 @@ describe('POST /api/parse/text', () => {
     expect(res.body.error).toMatch(/short/i);
   });
 
-  it('should parse valid resume text', async () => {
+  (HAS_API_KEY && LIVE_TEST ? it : it.skip)('should parse valid resume text', async () => {
     const sampleResume = `
       John Doe
       Software Engineer
@@ -56,7 +61,7 @@ describe('POST /api/parse/text', () => {
     expect(res.body.data.personal).toBeDefined();
     expect(res.body.data.skills).toBeInstanceOf(Array);
     expect(res.body.data.skills.length).toBeGreaterThan(0);
-  });
+  }, 30000);
 });
 
 describe('POST /api/parse/upload', () => {
