@@ -43,6 +43,9 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
+// ── Landing page ──
+app.use(express.static(path.join(__dirname, '../../landing')));
+
 // ── Static (for extension auto-update, if needed later) ──
 app.use('/static', express.static(path.join(__dirname, '../extension')));
 
@@ -54,8 +57,8 @@ app.use('/api/cover-letter', coverLetterRoutes);
 app.use('/api/sites', sitesRoutes);
 app.use('/api/match', matchRoutes);
 
-// ── 404 Handler ──
-app.use((req, res) => {
+// ── 404 Handler (only for /api routes) ──
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     error: 'Endpoint not found',
     path: req.path,

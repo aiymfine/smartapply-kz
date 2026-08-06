@@ -3,7 +3,7 @@
  * Tabbed interface: Autofill + Resume Score + Cover Letter
  */
 
-const SERVER_URL = 'http://localhost:3200';
+const SERVER_URL = 'https://smartapply-kz-production.up.railway.app';
 const SUPPORTED_DOMAINS = ['hh.kz', 'kz.hh.ru', 'almaty.hh.kz', 'astana.hh.kz', 'kaspi.kz', 'job.kaspi.kz', 'enbek.kz', 'jobs.enbek.kz'];
 
 let currentLang = 'en';

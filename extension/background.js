@@ -4,7 +4,7 @@
  * Manages resume data in Chrome storage
  */
 
-const SERVER_URL = 'http://localhost:3200';
+const SERVER_URL = 'https://smartapply-kz-production.up.railway.app';
 
 // ── Install handler ──
 chrome.runtime.onInstalled.addListener((details) => {
